@@ -12,8 +12,8 @@ const SLACK_TOKEN = process.env.SLACK_BOT_TOKEN;
 const CHANNEL_ID = process.env.SLACK_CHANNEL_ID;
 
 
-const messageOpen = "Bro Lab is open";
-const messageClose = "Bro Lab is closed";
+const messageOpen = "Bro lab is open";
+const messageClose = "Bro lab is closed";
 let currentBroStatus = true;
 let prevBroStatus = false;
 
@@ -52,17 +52,11 @@ export const printFromBro = async (req, res) =>
     }
 }
 
-
-
-
-
-
-const postMessageToSlack = async (message) => 
-{
+const postMessageToSlack = async (message) => {
     let response = null;
     try
     {
-        response = await axios.post('https://slack.com/api/chat.postMessage', {
+        response = await axios.post(process.env.URL, {
             "channel": CHANNEL_ID,
             "text": message,
         }, {
