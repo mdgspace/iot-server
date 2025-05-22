@@ -12,8 +12,8 @@ const SLACK_TOKEN = process.env.SLACK_BOT_TOKEN;
 const CHANNEL_ID = process.env.SLACK_CHANNEL_ID;
 
 
-const messageOpen = "Bro who is Ishaan";
-const messageClose = "Bro is closed";
+const messageOpen = "Bro Lab is open";
+const messageClose = "Bro Lab is closed";
 let currentBroStatus = true;
 let prevBroStatus = false;
 

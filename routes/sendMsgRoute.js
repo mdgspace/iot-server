@@ -1,6 +1,6 @@
-import express, { Router } from 'express';
+import { Router } from 'express';
 import { printFromBro } from '../controllers/printFromBro.js';
-import axios from 'axios';
+
 
 const router = Router();
 
