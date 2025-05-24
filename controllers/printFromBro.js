@@ -1,15 +1,11 @@
-import express, { Router } from 'express';
+import express from 'express';
 import axios from 'axios';
 import dotenv from 'dotenv';
-
-const app = express();
 dotenv.config();
-const router = express.Router();
-
-app.use(express.json());
 
 const SLACK_TOKEN = process.env.SLACK_BOT_TOKEN;
 const CHANNEL_ID = process.env.SLACK_CHANNEL_ID;
+
 
 
 const messageOpen = "Bro lab is open";
@@ -56,7 +52,7 @@ const postMessageToSlack = async (message) => {
     let response = null;
     try
     {
-        response = await axios.post(process.env.URL, {
+        response = await axios.post(process.env.BASE_URL, {
             "channel": CHANNEL_ID,
             "text": message,
         }, {
