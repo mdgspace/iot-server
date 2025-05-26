@@ -18,18 +18,10 @@ let currentBroStatus = true;
 let prevBroStatus = false;
 
 function reverseBroStatus() {
-    let message = "";
-    if(currentBroStatus)
-    {
-        currentBroStatus = false;
-        message = messageClose;
-    }else
-    {
-        currentBroStatus = true;
-        message = messageOpen;
-    }
-    return message;
+    currentBroStatus = !currentBroStatus
+    return currentBroStatus ? messageOpen: messageClose
 }
+
 
 export const printFromBro = async (req, res) => 
 {
