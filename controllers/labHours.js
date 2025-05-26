@@ -2,7 +2,7 @@ import { response } from 'express';
 import pool from '../config/db.js'
 
 const SAC_CLOSING_HOUR = 2
-const SAC_OPENING_HOUR = 7
+const SAC_OPENING_HOUR = 6
 
 
 export const toggleInOut = async (req, res) => {
