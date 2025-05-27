@@ -33,7 +33,7 @@ export const addHolder = async (req, res) => {
 
 export const getAllHolders = async (req, res) => {
     try{
-        const result = await pool.query('SELECT * FROM activeUsers');
+        const result = await pool.query('SELECT * FROM keyHolders');
 
         if(result.rows.length === 0) return res.status(404).send('no keyHolder found');
         // console.log(blog);
