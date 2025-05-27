@@ -1,19 +1,18 @@
 import express from 'express';
-import { fileURLToPath } from 'url';
-import path from 'path';
+// import { fileURLToPath } from 'url';
+// import path from 'path';
 import dotenv from 'dotenv';
-
 import sendMsgRoute from './routes/sendMsgRoute.js';
 import keyHolderRoutes from './routes/keyHolderRoutes.js';
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import cors from 'cors';
+
 
 dotenv.config();
+
 const app = express();
+app.use(cors());
+app.use(express.json());    
 
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
 app.use('/api/message', sendMsgRoute);
 app.use('/api/keyHolders', keyHolderRoutes);
 
