@@ -31,3 +31,18 @@ if currentBroStatus was true, it will invert it's state to false and print messa
 # customizing
 As of now, every time the server starts, the first call to /api/message/sendMsg will print whatever string is in the variable messageClose in printFromBro.js
 To customize the values of whatever is printed and the first message to be printed, change the values of those 3 variables accordingly
+
+# endpoints
+
+1. hostname/api/message/sendMsg To send alternating message in slack channel
+2. hostname/api/keyHolders/getHolders to get all current key holders
+3. hostname/api/keyHolders/addHolder (post request with enroll_num as body of request) to add enrollment number to keyholders table.
+
+# env variables
+
+1. SLACK_BOT_TOKEN
+2. SLACK_CHANNEL_ID
+These both are for the sendMSg route
+3. DATABASE_URL
+To connect with database
+4. PORT (to specify port for localhost)
