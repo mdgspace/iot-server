@@ -1,7 +1,8 @@
 import pool from "../config/db.js";
 export const addHolder = async (req, res) => {
     console.log(req.body);
-    const { enroll_num } = req.body;
+    const {enroll_num} = req.body['rollno'];
+    // console.log(head);
     const enroll_num_str = enroll_num.toString();
     const yearPrefix = enroll_num_str.substring(0, 2);
 
