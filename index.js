@@ -4,6 +4,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import sendMsgRoute from './routes/sendMsgRoute.js';
 import keyHolderRoutes from './routes/keyHolderRoutes.js';
+import labHoursRoutes from './routes/labHoursRoutes.js'
+
 import cors from 'cors';
 
 
@@ -15,6 +17,7 @@ app.use(express.json());
 
 app.use('/api/message', sendMsgRoute);
 app.use('/api/keyHolders', keyHolderRoutes);
+app.use('/api/labHours', labHoursRoutes)
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
