@@ -21,6 +21,10 @@ export const toggleInOut = async (req, res) => {
 
 
         var labData = initStatus['labdata'] // json
+        if (initStatus == null){
+            res.status(500).json({ 'status': 'User not found', 'labdata': labData });
+            return;
+        }
 
         if (labData == null) {
             labData = { "logs": [], "isInLab": false, "labTime": 0 }
@@ -41,7 +45,7 @@ export const toggleInOut = async (req, res) => {
             logs.push(newlog)
             response_str = "Toggle successful"
             isInLab = true
-            
+
 
         }
 
