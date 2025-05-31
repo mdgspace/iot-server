@@ -20,11 +20,11 @@ export const toggleInOut = async (req, res) => {
         // console.log(new Date(new Date()).setHours(0,0,0,0));
 
 
-        var labData = initStatus['labdata'] // json
         if (initStatus == null){
             res.status(500).json({ 'status': 'User not found', 'labdata': labData });
             return;
         }
+        var labData = initStatus['labdata'] // json
 
         if (labData == null) {
             labData = { "logs": [], "isInLab": false, "labTime": 0, "dayWise": {} }
