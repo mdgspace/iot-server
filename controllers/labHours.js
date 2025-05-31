@@ -27,8 +27,9 @@ export const toggleInOut = async (req, res) => {
         }
 
         if (labData == null) {
-            labData = { "logs": [], "isInLab": false, "labTime": 0 }
+            labData = { "logs": [], "isInLab": false, "labTime": 0, "dayWise": {} }
         }
+        console.log(labData)
 
         let logs = labData["logs"] // format for logs: [ ['IN' or 'OUT' , 'iso time string'], ]
         let labTime = labData.labTime // float in hours
@@ -36,9 +37,14 @@ export const toggleInOut = async (req, res) => {
         let isInLab = labData.isInLab //bool
         console.log(isInLab)
 
+
+        var dayWiseData = labData['dayWise'] // like this: {'DATESTRING': float, 'DATESTRING2': float}
+
         let new_timestamp = new Date();
 
-        // as a safeguard, we need to check if the last entry time was before 2 AM and the exit time is the next day, then that means there is faulty entry
+
+
+    // as a safeguard, we need to check if the last entry time was before 2 AM and the exit time is the next day, then that means there is faulty entry
 
         if (logs.length == 0) {
             let newlog = ['IN', new_timestamp.toISOString()]
@@ -51,6 +57,17 @@ export const toggleInOut = async (req, res) => {
 
         else {
             let last_log = logs[logs.length - 1]
+            let old_timestamp = new Date(last_log[1]);
+
+            const ddo = String(old_timestamp.getDate()).padStart(2, '0');
+            const mmo = String(old_timestamp.getMonth() + 1).padStart(2, '0'); 
+            const yyo = String(old_timestamp.getFullYear()).slice(-2);
+
+            const oldDate = ddo + mmo + yyo;
+
+            if (!(oldDate in dayWiseData)){
+                dayWiseData[oldDate] = 0
+            }
 
             if (last_log[0] == "IN") {
                 let old_timestamp = new Date(last_log[1]);
@@ -79,6 +96,8 @@ export const toggleInOut = async (req, res) => {
                         let timedelta_hours = (new_timestamp - old_timestamp) / (1000 * 60 * 60)
                         console.log(timedelta_hours)
                         labTime += timedelta_hours
+                        dayWiseData[oldDate] += timedelta_hours
+
                         response_str = "Toggle successful"
                         console.log(labTime)
                         isInLab = false
@@ -91,6 +110,8 @@ export const toggleInOut = async (req, res) => {
                         logs.push(newlog)
                         let timedelta_hours = (new_timestamp - old_timestamp) / (1000 * 60 * 60)
                         labTime += timedelta_hours
+                        dayWiseData[oldDate] += timedelta_hours
+
                         response_str = "Toggle successful"
                         isInLab = false
                     }
@@ -129,12 +150,13 @@ export const toggleInOut = async (req, res) => {
             }
 
         }
-
+        
 
         labData['logs'] = logs
         console.log(labTime)
         labData['labTime'] = labTime
         labData['isInLab'] = isInLab
+        labData['dayWise'] = dayWiseData
 
 
 
