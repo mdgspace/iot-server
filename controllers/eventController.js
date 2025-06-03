@@ -4,7 +4,7 @@ import { createEvent, getEventByTimestamp } from '../models/eventModel.js';
 import dotenv from 'dotenv';
 import axios from 'axios';
 import { addReaction, removeReaction } from '../models/reactionModel.js';
-import { printFromBro } from './printFromBro.js';
+
 dotenv.config();
 
 const EventBotToken = process.env.EVENT_MANAGER_BOT_TOKEN;
