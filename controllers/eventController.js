@@ -1,11 +1,14 @@
 import parseEventTime from '../services/timeParser.js';
 import parseEmoji from '../services/emojiParser.js';
-import { createEvent, getEventByTimestamp } from '../models/eventModel.js';
-import dotenv from 'dotenv';
-import axios from 'axios';
+import { createEvent, getEventByTimestamp, getAttendeeById, getLatestEvent, updateStartedFlag } from '../models/eventModel.js';
 import { addReaction, removeReaction } from '../models/reactionModel.js';
+import axios from 'axios';
+import dotenv from 'dotenv';
+import { WebClient } from '@slack/web-api';
+import { request } from 'express';
 
 dotenv.config();
+const slackClient = new WebClient(process.env.EVENT_MANAGER_BOT_TOKEN);
 
 const EventBotToken = process.env.EVENT_MANAGER_BOT_TOKEN;
 
@@ -16,11 +19,11 @@ export const handleAppMention = async (event) => {
   const emoji = parseEmoji(text);
 
   if (!event_time) {
-    console.log('❌ Message does not contain valid event time');
+    console.log(' Message does not contain valid event time');
     return;
   }
   if (!emoji) {
-    console.log('❌ Message does not contain valid emoji')
+    console.log('Message does not contain valid emoji')
     return;
   }
 
@@ -37,11 +40,11 @@ export const handleAppMention = async (event) => {
   try {
     const result = await createEvent(createEventObj);
 
-    console.log('✅ Event stored in DB:', result.rows[0]);
+    console.log(' Event stored in DB:', result.rows[0]);
     const message = "Event successfully created!";
     postMessageToSlack(message, createEventObj.channel);
   } catch (err) {
-    console.error('🚨 Error storing event:', err);
+    console.error(' Error storing event:', err);
   }
 };
 
@@ -65,14 +68,14 @@ const postMessageToSlack = async (message, channelId) => {
 }
 
 export const handleReactionAdded = async (event) => {
-  console.log('👍 Processing reaction_added event');
+  console.log('Processing reaction_added event');
   const { user, reaction, item } = event;
 
   const savedEvent = await getEventByTimestamp(item.ts);
   // console.log(reaction);
   // console.log(item);
   // console.log(savedEvent);
-  
+
   const savedEmojiArr = savedEvent.emoji.split(':');
   const savedEmoji = savedEmojiArr[1];
 
@@ -100,7 +103,7 @@ export const handleReactionRemoved = async (event) => {
   // console.log(reaction);
   // console.log(item);
   // console.log(savedEvent);
-  
+
   const savedEmojiArr = savedEvent.emoji.split(':');
   const savedEmoji = savedEmojiArr[1];
 
@@ -118,4 +121,40 @@ export const handleReactionRemoved = async (event) => {
     console.log("Emoji does not match required emoji");
     return;
   }
+}
+
+export const fetchAttendeeNames = async (req, res) => {
+  try {
+    const [event] = await getLatestEvent();
+    console.log("This is event: ", event);
+    if (!event) {
+      return res.json({ message: 'No Event Found', rows: [] });
+    }
+    const eventId = event.id;
+    console.log(eventId);
+    const uids = await getAttendeeById(eventId);
+
+    const names = [];
+
+    for (const userId of uids) {
+      try {
+        const userInfo = await slackClient.users.info({ user: userId });
+        const name = userInfo.user.profile.display_name || userInfo.user.real_name || userId;
+        names.push(name);
+      } catch (err) {
+        console.error(`Failed to fetch name for user ${userId}`, err.data?.error);
+        names.push(userId);
+      }
+    }
+
+    return res.json({ message: 'Event Found', rows: names });
+  } catch (error) {
+    console.log("error occured!");
+    console.log(error)
+    res.status(500).json({ message: 'Server Error', rows: [] });
+  }
+
+
+
+
 }

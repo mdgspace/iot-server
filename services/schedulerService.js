@@ -1,6 +1,7 @@
 import pool from '../config/db.js';
 import { WebClient } from '@slack/web-api';
 import dotenv from 'dotenv';
+import { updateStartedFlag } from '../models/eventModel.js';
 
 dotenv.config();
 const slackClient = new WebClient(process.env.EVENT_MANAGER_BOT_TOKEN);
@@ -53,7 +54,29 @@ const sendDMReminders = async () => {
     }
 };
 
+const updateStartStatus = async () => {
+    const now = new Date();
+    const fiveMinLater = new Date(now.getTime() + 5 * 60000).toISOString();
+
+    try {
+        const { rows: startingEvents } = await pool.query(`
+      SELECT * FROM events
+      WHERE event_time <= $1
+    `, [fiveMinLater]);
+
+    for(const event of startingEvents) 
+    {
+        const eventId = event.id;
+        await updateStartedFlag(eventId);
+    }
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 export const startScheduler = () => {
     console.log('🔁 Scheduler running every 60 seconds...');
     setInterval(sendDMReminders, 60 * 1000);
+    setInterval(updateStartStatus, 60 * 1000);
 };

@@ -18,6 +18,23 @@ export const getEventByTimestamp = async (ts) => {
 };
 
 export const getLatestEvent = async () => {
-  const query = `SELECT * FROM events ORDER BY event_time DESC LIMIT 1;`;
-  return pool.query(query);
+  const query = `SELECT * FROM events WHERE started = FALSE ORDER BY event_time ASC LIMIT 1`;
+  const result = await pool.query(query);
+  // console.log(result);
+  return result.rows;
+};
+
+export const getAttendeeById = async (id) => {
+  console.log(id);
+  const result = await pool.query(
+    'SELECT user_id FROM reactions WHERE event_id = $1;',
+    [id]
+  );
+  console.log(result);
+  return result.rows.map(row => row.user_id);
+}
+
+export const updateStartedFlag = async (id) => {
+  const query = `UPDATE events SET started = true WHERE id = $1;`;
+  return pool.query(query, [id]);
 };
