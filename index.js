@@ -4,7 +4,10 @@ import express from 'express';
 import dotenv from 'dotenv';
 import sendMsgRoute from './routes/sendMsgRoute.js';
 import keyHolderRoutes from './routes/keyHolderRoutes.js';
-import labHoursRoutes from './routes/labHoursRoutes.js'
+import labHoursRoutes from './routes/labHoursRoutes.js';
+import slackRoutes from './routes/slackRoutes.js';
+import eventApiRoutes from './routes/eventApiRoutes.js'
+import { startScheduler } from './services/schedulerService.js';
 
 import maintenanceRoute from './routes/maintenanceRoute.js'
 
@@ -12,15 +15,19 @@ import cors from 'cors';
 
 
 dotenv.config();
-
 const app = express();
+app.use('/slack', slackRoutes);
+
 app.use(cors());
 app.use(express.json());  
 app.use(express.urlencoded({ extended: true }));  
 
 app.use('/api/message', sendMsgRoute);
 app.use('/api/keyHolders', keyHolderRoutes);
-app.use('/api/labHours', labHoursRoutes)
+app.use('/api/labHours', labHoursRoutes);
+app.use('/api/eventApi', eventApiRoutes);
+startScheduler();
+
 app.use('/api/maintenance', maintenanceRoute)
 
 const PORT = process.env.PORT;
