@@ -16,6 +16,7 @@ export const handleAppMention = async (event) => {
   const { text, channel, user, ts } = event;
 
   const event_time = parseEventTime(text);
+  console.log('Event time:', event_time);
   const emoji = parseEmoji(text);
 
   if (!event_time) {

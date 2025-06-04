@@ -26,5 +26,6 @@ export default function parseEventTime(message) {
   if (!timeStr) return null;
 
   const parsedDate = chrono.parseDate(timeStr);
+  console.log('Parsed Date:', parsedDate);
   return parsedDate ? parsedDate.toISOString() : null;
 }
