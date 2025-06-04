@@ -8,10 +8,21 @@ import labHoursRoutes from './routes/labHoursRoutes.js'
 
 import maintenanceRoute from './routes/maintenanceRoute.js'
 
+import {doMaintenance} from './controllers/maintenance.js'
+
 import cors from 'cors';
 
-
+import {Worker} from 'node:worker_threads';
 dotenv.config();
+
+function spawn_maintenance_thread(){
+    const worker = new Worker('./worker.js')
+    worker.on('message', async ()=>{
+        console.log("starting maintenance")
+        await doMaintenance()
+        console.log("maintenance performed")
+    })
+}
 
 const app = express();
 app.use(cors());
@@ -22,6 +33,8 @@ app.use('/api/message', sendMsgRoute);
 app.use('/api/keyHolders', keyHolderRoutes);
 app.use('/api/labHours', labHoursRoutes)
 app.use('/api/maintenance', maintenanceRoute)
+
+spawn_maintenance_thread()
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
