@@ -9,6 +9,8 @@ import slackRoutes from './routes/slackRoutes.js';
 import eventApiRoutes from './routes/eventApiRoutes.js'
 import { startScheduler } from './services/schedulerService.js';
 
+import maintenanceRoute from './routes/maintenanceRoute.js'
+
 import cors from 'cors';
 
 
@@ -26,6 +28,7 @@ app.use('/api/labHours', labHoursRoutes);
 app.use('/api/eventApi', eventApiRoutes);
 startScheduler();
 
+app.use('/api/maintenance', maintenanceRoute)
 
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
