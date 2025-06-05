@@ -1,8 +1,8 @@
 import pool from '../config/db.js'
 
-export const setupLogs = async(req, res) =>{
-    try{
-        const initial = await pool.query(
+
+export async function doMaintenance(){
+            const initial = await pool.query(
             'SELECT * FROM activeUsers'
         );
 
@@ -28,7 +28,8 @@ export const setupLogs = async(req, res) =>{
             if (labData == null) {
                 labData = { 'logs': [], 'isInLab': false, 'labTime': 0, 'dayWise': {} };
             }
-
+            console.log('pritimg labdaat')
+            console.log(labData)
             if (!(datestr in labData.dayWise)) {
                 labData.dayWise[datestr] = 0;
             }
@@ -43,7 +44,12 @@ export const setupLogs = async(req, res) =>{
         const query = `INSERT INTO activeUsers (enroll_num, labdata) VALUES ${placeholders.join(', ')}`;
         await pool.query(query, values);
 
+}
 
+export const setupLogs = async(req, res) =>{
+    try{
+
+        await doMaintenance();
         res.status(201).json({ 'message': 'Maintenance success'}    );
 
 
