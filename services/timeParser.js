@@ -1,31 +1,35 @@
-import * as chrono from 'chrono-node';
-
 export default function parseEventTime(message) {
-
-    // I am expecting the message to follow the following format:
-
-    // Description of the entire event  \n
-
-    // Event time is ------- \n
-
-    // react with :emoji: to -----
-
-    // The operations done below first split all lines into seperate lines by using the newline character.
-    // Then we look for line which starts with the phrase 'event time is'
-    // then I remove that phrase to find the time and then use chrono-node to parse the text into ISO time.
-    
-    // In slack, when one presses shift + enter, it inserts a newline character. So I expect users of the bot to go to a 
-    // newline by using shift + enter and start with the phrase 'event time is' to let the bot do it's work.
-
   const lines = message.split('\n');
   const timeLine = lines.find(line => line.toLowerCase().startsWith('event time is'));
 
   if (!timeLine) return null;
 
-  const timeStr = timeLine.toLowerCase().split('event time is')[1]?.trim();
+  const timeStr = timeLine.substring('event time is'.length).trim(); 
   if (!timeStr) return null;
 
-  const parsedDate = chrono.parseDate(timeStr);
-  console.log('Parsed Date:', parsedDate);
-  return parsedDate ? parsedDate.toISOString() : null;
+  const dateTimeRegex = /^(\d{2})\/(\d{2})\/(\d{2}) (\d{1,2}):(\d{2})\s*(AM|PM)$/i;
+  const match = timeStr.match(dateTimeRegex);
+
+  if (!match) return null;
+
+  let [, day, month, year, hour, minute, meridiem] = match;
+
+  day = parseInt(day, 10);
+  month = parseInt(month, 10) - 1;
+  year = parseInt(year, 10);
+  hour = parseInt(hour, 10);
+  minute = parseInt(minute, 10);
+
+  year += (year < 50 ? 2000 : 1900);
+
+  if (meridiem.toUpperCase() === 'PM' && hour < 12) {
+    hour += 12;
+  } else if (meridiem.toUpperCase() === 'AM' && hour === 12) {
+    hour = 0;
+  }
+
+  const dateObj = new Date(Date.UTC(year, month, day, hour, minute));
+  // console.log('Parsed date object:', dateObj);
+  return dateObj.toISOString();
 }
+
