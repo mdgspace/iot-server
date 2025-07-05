@@ -69,57 +69,71 @@ const postMessageToSlack = async (message, channelId) => {
 }
 
 export const handleReactionAdded = async (event) => {
-  console.log('Processing reaction_added event');
-  const { user, reaction, item } = event;
+  try{
 
-  const savedEvent = await getEventByTimestamp(item.ts);
-  // console.log(reaction);
-  // console.log(item);
-  // console.log(savedEvent);
-
-  const savedEmojiArr = savedEvent.emoji.split(':');
-  const savedEmoji = savedEmojiArr[1];
-
-
-
-  if (reaction == savedEmoji) {
-    const params = {
-      event_id: savedEvent.id,
-      user_id: user,
-      reaction: reaction,
+    console.log('Processing reaction_added event');
+    const { user, reaction, item } = event;
+  
+    const savedEvent = await getEventByTimestamp(item.ts);
+    // console.log(reaction);
+    // console.log(item);
+    // console.log(savedEvent);
+  
+    const savedEmojiArr = savedEvent.emoji.split(':');
+    const savedEmoji = savedEmojiArr[1];
+  
+  
+  
+    if (reaction == savedEmoji) {
+      const params = {
+        event_id: savedEvent.id,
+        user_id: user,
+        reaction: reaction,
+      }
+      await addReaction(params);
+      return;
+    } else {
+      console.log("Emoji does not match required emoji");
+      return;
     }
-    await addReaction(params);
-    return;
-  } else {
-    console.log("Emoji does not match required emoji");
+  } catch(err)
+  {
+    console.error(err);
     return;
   }
 }
 
 export const handleReactionRemoved = async (event) => {
   console.log('👍 Processing reaction_added event');
-  const { user, reaction, item } = event;
 
-  const savedEvent = await getEventByTimestamp(item.ts);
-  // console.log(reaction);
-  // console.log(item);
-  // console.log(savedEvent);
-
-  const savedEmojiArr = savedEvent.emoji.split(':');
-  const savedEmoji = savedEmojiArr[1];
-
-
-
-  if (reaction == savedEmoji) {
-    const params = {
-      event_id: savedEvent.id,
-      user_id: user,
-      reaction: reaction,
+  try{
+    const { user, reaction, item } = event;
+  
+    const savedEvent = await getEventByTimestamp(item.ts);
+    // console.log(reaction);
+    // console.log(item);
+    // console.log(savedEvent);
+  
+    const savedEmojiArr = savedEvent.emoji.split(':');
+    const savedEmoji = savedEmojiArr[1];
+  
+  
+  
+    if (reaction == savedEmoji) {
+      const params = {
+        event_id: savedEvent.id,
+        user_id: user,
+        reaction: reaction,
+      }
+      await removeReaction(params);
+      return;
+    } else {
+      console.log("Emoji does not match required emoji");
+      return;
     }
-    await removeReaction(params);
-    return;
-  } else {
-    console.log("Emoji does not match required emoji");
+  }catch (err)
+  {
+    console.error(err);
     return;
   }
 }
