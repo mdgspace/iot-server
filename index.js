@@ -7,6 +7,8 @@ import keyHolderRoutes from './routes/keyHolderRoutes.js';
 import labHoursRoutes from './routes/labHoursRoutes.js';
 import slackRoutes from './routes/slackRoutes.js';
 import eventApiRoutes from './routes/eventApiRoutes.js'
+import graphRoutes from './routes/getGraphsRoute.js'
+
 import { startScheduler } from './services/schedulerService.js';
 
 import maintenanceRoute from './routes/maintenanceRoute.js'
@@ -38,6 +40,7 @@ app.use('/api/message', sendMsgRoute);
 app.use('/api/keyHolders', keyHolderRoutes);
 app.use('/api/labHours', labHoursRoutes);
 app.use('/api/eventApi', eventApiRoutes);
+app.use('/api/graphs/', graphRoutes);
 startScheduler();
 
 app.use('/api/maintenance', maintenanceRoute)

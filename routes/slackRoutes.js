@@ -11,7 +11,7 @@ const router = express.Router();
 router.use('/events', slackEvents.expressMiddleware());
 // Handle app mentions
 slackEvents.on('app_mention', async (event) => {
-  console.log('🔔 App mentioned:', event.text);
+  console.log('App mentioned:', event.text);
   await handleAppMention(event);
 });
 slackEvents.on('reaction_added', async (event) => {
