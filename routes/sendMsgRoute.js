@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { printFromBro } from '../controllers/printFromBro.js';
+import { printFromBro } from '../controllers/labBot.js';
 
 
 const router = Router();

@@ -11,7 +11,7 @@
   <script>
     async function loadGraph() {
       try {
-        const response = await fetch('http://localhost:5000/api/graphs/bytag/b28/alltime');
+        const response = await fetch('http://localhost:5000/api/graphs/bytag/b28/weekly');
         if (!response.ok) throw new Error('Image fetch failed');
 
         const blob = await response.blob();
