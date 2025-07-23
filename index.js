@@ -45,6 +45,12 @@ startScheduler();
 
 app.use('/api/maintenance', maintenanceRoute)
 
+app.use((err, req, res, next) => {
+  console.error('Unhandled Error:', err.stack);
+  res.status(500).send('Internal Server Error');
+});
+
+
 spawn_maintenance_thread()
 
 const PORT = process.env.PORT;

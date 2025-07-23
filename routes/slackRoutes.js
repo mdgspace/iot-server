@@ -1,15 +1,17 @@
 import express from 'express';
 import { createEventAdapter } from '@slack/events-api';
 import dotenv from 'dotenv';
-import { handleAppMention_event, handleReactionAdded, handleReactionRemoved } from '../controllers/eventController.js';
-import { handleAppMention_labbot } from '../controllers/labBot.js';
+import { handleAppMention as handleAppMention_event, handleReactionAdded, handleReactionRemoved } from '../controllers/eventController.js';
+import { handleAppMention as handleAppMention_labbot} from '../controllers/labBot.js';
 
 dotenv.config();
 
-const slackEvents = createEventAdapter(process.env.SLACK_SIGNING_SECRET);
+const slackEvents = createEventAdapter(process.env.LAB_BOT_SIGNING_SECRET);
 const router = express.Router();
 
+
 router.use('/events', slackEvents.expressMiddleware());
+
 // Handle app mentions
 slackEvents.on('app_mention', async (event) => {
   console.log('App mentioned:', event.text);
