@@ -15,9 +15,16 @@ const EventBotToken = process.env.EVENT_MANAGER_BOT_TOKEN;
 export const handleAppMention = async (event) => {
   const { text, channel, user, ts } = event;
 
-  const event_time = parseEventTime(text);
-  console.log('Event time:', event_time);
-  const emoji = parseEmoji(text);
+  try{
+    const event_time = parseEventTime(text);
+    console.log('Event time:', event_time);
+    const emoji = parseEmoji(text);
+
+  }
+  catch(error){
+    console.log(' Message is not meant for event');
+    return;
+  }
 
   if (!event_time) {
     console.log(' Message does not contain valid event time');
