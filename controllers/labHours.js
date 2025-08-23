@@ -1,4 +1,3 @@
-import { response } from 'express';
 import pool from '../config/db.js'
 
 const SAC_CLOSING_HOUR = 2.0
@@ -11,7 +10,7 @@ export const toggleInOut = async (req, res) => {
 
     try {
         const initial = await pool.query(
-            'SELECT * FROM activeUsers WHERE (enroll_num)=($1)', [enroll_num]
+            'SELECT * FROM members_info WHERE (enrollment_num)=($1)', [enroll_num]
         );
 
         let initStatus = initial.rows[0];
@@ -161,7 +160,7 @@ export const toggleInOut = async (req, res) => {
 
 
         const response = await pool.query(
-            'UPDATE activeUsers SET labdata=($1) WHERE enroll_num = ($2)', [labData, enroll_num]
+            'UPDATE members_info SET labdata=($1) WHERE enrollment_num = ($2)', [labData, enroll_num]
         );
 
 

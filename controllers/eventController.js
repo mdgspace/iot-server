@@ -15,38 +15,44 @@ const EventBotToken = process.env.EVENT_MANAGER_BOT_TOKEN;
 export const handleAppMention = async (event) => {
   const { text, channel, user, ts } = event;
 
-  const event_time = parseEventTime(text);
-  console.log('Event time:', event_time);
-  const emoji = parseEmoji(text);
-
-  if (!event_time) {
-    console.log(' Message does not contain valid event time');
-    return;
-  }
-  if (!emoji) {
-    console.log('Message does not contain valid emoji')
-    return;
-  }
-
-  const createEventObj =
-  {
-    message: text,
-    channel: channel,
-    created_by: user,
-    event_time: event_time,
-    emoji: emoji,
-    ts: ts
-  }
-
   try {
-    const result = await createEvent(createEventObj);
+    const event_time = parseEventTime(text);
+    console.log('Event time:', event_time);
+    const emoji = parseEmoji(text);
+    if (event_time == null) {
+      console.log(' Message does not contain valid event time');
+      return;
+    }
+    if (!emoji) {
+      console.log('Message does not contain valid emoji')
+      return;
+    }
 
-    console.log(' Event stored in DB:', result.rows[0]);
-    const message = "Event successfully created!";
-    postMessageToSlack(message, createEventObj.channel);
-  } catch (err) {
-    console.error(' Error storing event:', err);
+    const createEventObj =
+    {
+      message: text,
+      channel: channel,
+      created_by: user,
+      event_time: event_time,
+      emoji: emoji,
+      ts: ts
+    }
+
+    try {
+      const result = await createEvent(createEventObj);
+
+      console.log(' Event stored in DB:', result.rows[0]);
+      const message = "Event successfully created!";
+      postMessageToSlack(message, createEventObj.channel);
+    } catch (err) {
+      console.error(' Error storing event:', err);
+    }
   }
+  catch (error) {
+    console.log(' Message is not meant for event');
+    return;
+  }
+
 };
 
 const postMessageToSlack = async (message, channelId) => {

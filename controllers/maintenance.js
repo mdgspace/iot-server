@@ -2,12 +2,11 @@ import pool from '../config/db.js'
 
 
 export async function doMaintenance(){
-            const initial = await pool.query(
-            'SELECT * FROM activeUsers'
+        const initial = await pool.query(
+            'SELECT * FROM members_info'
         );
 
-
-
+        
         let date = new Date();
 
         const dd = String(date.getDate()).padStart(2, '0');
@@ -22,14 +21,13 @@ export async function doMaintenance(){
 
         for (let i = 0; i < initial.rows.length; i++) {
             const row = initial.rows[i];
-            const enrollNo = row['enroll_num'];
+            const enrollNo = row['enrollment_num'];
             let labData = row['labdata'];
 
             if (labData == null) {
                 labData = { 'logs': [], 'isInLab': false, 'labTime': 0, 'dayWise': {} };
             }
-            console.log('pritimg labdaat')
-            console.log(labData)
+
             if (!(datestr in labData.dayWise)) {
                 labData.dayWise[datestr] = 0;
             }
@@ -37,14 +35,20 @@ export async function doMaintenance(){
             values.push(enrollNo, JSON.stringify(labData));
             const idx = i * 2;
             placeholders.push(`($${idx + 1}, $${idx + 2})`);
+
+            await pool.query(
+                `UPDATE members_info
+                SET labdata = $1
+                WHERE enrollment_num = $2`,
+                [labData, enrollNo]
+            );
+
+
+
         }
 
-        await pool.query('TRUNCATE TABLE activeUsers');
-
-        const query = `INSERT INTO activeUsers (enroll_num, labdata) VALUES ${placeholders.join(', ')}`;
-        await pool.query(query, values);
-
 }
+
 
 export const setupLogs = async(req, res) =>{
     try{
