@@ -228,7 +228,7 @@ const postMessageToSlack = async (message) => {
         }, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${SLACK_TOKEN}`,
+                'Authorization': `Bearer ${BotToken}`,
             },
         });
     } catch (error) {
