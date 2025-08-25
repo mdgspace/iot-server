@@ -14,9 +14,6 @@ export const toggleInOut = async (req, res) => {
         );
 
         let initStatus = initial.rows[0];
-        console.log(initStatus);
-        // console.log(new Date());
-        // console.log(new Date(new Date()).setHours(0,0,0,0));
 
 
         if (initStatus == null){
@@ -28,13 +25,10 @@ export const toggleInOut = async (req, res) => {
         if (labData == null) {
             labData = { "logs": [], "isInLab": false, "labTime": 0, "dayWise": {} }
         }
-        console.log(labData)
 
         let logs = labData["logs"] // format for logs: [ ['IN' or 'OUT' , 'iso time string'], ]
         let labTime = labData.labTime // float in hours
-        console.log(labTime)
         let isInLab = labData.isInLab //bool
-        console.log(isInLab)
 
 
         var dayWiseData = labData['dayWise'] // like this: {'DATESTRING': float, 'DATESTRING2': float}
@@ -51,7 +45,6 @@ export const toggleInOut = async (req, res) => {
             response_str = "Toggle successful"
             isInLab = true
 
-
         }
 
         else {
@@ -66,7 +59,7 @@ export const toggleInOut = async (req, res) => {
 
             if (!(oldDate in dayWiseData)){
                 dayWiseData[oldDate] = 0
-            }
+            } 
 
             if (last_log[0] == "IN") {
                 let old_timestamp = new Date(last_log[1]);
@@ -86,20 +79,31 @@ export const toggleInOut = async (req, res) => {
                         // and there will be no difference in lab hours, as the previous in is invalid
                         response_str = "Invalid sequence of entries, previous entry discarded"
                         isInLab = true
-
                     }
+
                     else if (old_timestamp.getHours() > SAC_OPENING_HOUR) {
                         let newlog = ['OUT', new_timestamp.toISOString()]
                         logs.push(newlog)
-                        console.log("In here")
                         let timedelta_hours = (new_timestamp - old_timestamp) / (1000 * 60 * 60)
-                        console.log(timedelta_hours)
                         labTime += timedelta_hours
                         dayWiseData[oldDate] += timedelta_hours
 
                         response_str = "Toggle successful"
-                        console.log(labTime)
                         isInLab = false
+                    }
+                    else if (old_timestamp.getHours() >=0 && new_timestamp.getHours() <= SAC_CLOSING_HOUR){
+                        let newlog = ['OUT', new_timestamp.toISOString()]
+                        logs.push(newlog)
+                        // console.log("In here")
+                        let timedelta_hours = (new_timestamp - old_timestamp) / (1000 * 60 * 60)
+                        // console.log(timedelta_hours)
+                        labTime += timedelta_hours
+                        dayWiseData[oldDate] += timedelta_hours
+
+                        response_str = "Toggle successful"
+                        // console.log(labTime)
+                        isInLab = false
+
                     }
                 }
                 else if (delta_days == 1) {
@@ -144,15 +148,13 @@ export const toggleInOut = async (req, res) => {
                 logs.push(newlog)
                 response_str = "Toggle successful"
                 isInLab = true
-
-                console.log(initStatus)
             }
 
         }
         
 
         labData['logs'] = logs
-        console.log(labTime)
+        // console.log(labTime)
         labData['labTime'] = labTime
         labData['isInLab'] = isInLab
         labData['dayWise'] = dayWiseData
@@ -165,6 +167,7 @@ export const toggleInOut = async (req, res) => {
 
 
         res.status(201).json({ 'status': response_str, 'labdata': labData });
+        console.log("reached here 6")
 
     } catch (err) {
         console.log(err);
