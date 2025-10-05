@@ -167,7 +167,6 @@ export const toggleInOut = async (req, res) => {
 
 
         res.status(201).json({ 'status': response_str, 'labdata': labData });
-        console.log("reached here 6")
 
     } catch (err) {
         console.log(err);
