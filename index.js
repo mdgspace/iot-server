@@ -1,19 +1,20 @@
-import express from 'express';
-// import { fileURLToPath } from 'url';
-// import path from 'path';
+import pkg from "@slack/bolt";
 import dotenv from 'dotenv';
-import sendMsgRoute from './routes/sendMsgRoute.js';
-import keyHolderRoutes from './routes/keyHolderRoutes.js';
-import labHoursRoutes from './routes/labHoursRoutes.js';
-import slackRoutes from './routes/slackRoutes.js';
-import eventApiRoutes from './routes/eventApiRoutes.js'
-import graphRoutes from './routes/getGraphsRoute.js'
+import express from 'express'
+
+import { printFromBro } from './controllers/labBot.js';
+import { addHolder, getAllHolders } from "./controllers/keyHolders.js";
+import {toggleInOut} from "./controllers/labHours.js";
+import { fetchAttendeeNames } from './controllers/eventController.js'
+import { myGraph, graphByTag } from './controllers/graphsController.js'
+import {setupLogs} from './controllers/maintenance.js'
+
 
 import { startScheduler } from './services/schedulerService.js';
-
-import maintenanceRoute from './routes/maintenanceRoute.js'
-
 import {doMaintenance} from './controllers/maintenance.js'
+
+import { handleAppMention as handleAppMention_event, handleReactionAdded, handleReactionRemoved } from './controllers/eventController.js';
+import { handleAppMention as handleAppMention_labbot} from './controllers/labBot.js';
 
 import cors from 'cors';
 
@@ -29,31 +30,62 @@ function spawn_maintenance_thread(){
     })
 }
 
-const app = express();
-app.use('/slack', slackRoutes);
 
-app.use(cors());
-app.use(express.json());  
-app.use(express.urlencoded({ extended: true }));  
+const App = pkg.App;
+const ExpressReceiver = pkg.ExpressReceiver;
 
-app.use('/api/message', sendMsgRoute);
-app.use('/api/keyHolders', keyHolderRoutes);
-app.use('/api/labHours', labHoursRoutes);
-app.use('/api/eventApi', eventApiRoutes);
-app.use('/api/graphs/', graphRoutes);
-startScheduler();
+const receiver = new ExpressReceiver({ signingSecret: process.env.LAB_BOT_SIGNING_SECRET });
 
-app.use('/api/maintenance', maintenanceRoute)
+const app = new App({
+    token: process.env.LAB_BOT_TOKEN,
+    receiver
+})
 
-app.use((err, req, res, next) => {
-  console.error('Unhandled Error:', err.stack);
-  res.status(500).send('Internal Server Error');
+
+receiver.router.use(cors());
+receiver.router.use(express.json());  
+receiver.router.use(express.urlencoded({ extended: true }));  
+
+app.event('app_mention', async ({event}) => {
+  console.log('App mentioned:', event.text);
+  await handleAppMention_event(event);
+  await handleAppMention_labbot(event);
 });
 
+app.event('reaction_added', async ({event}) => {
+  console.log('Reacted to app');
+  await handleReactionAdded(event);
+});
+
+app.event('reaction_removed', async ({event}) => {
+  console.log('removed reaction');
+  await handleReactionRemoved(event);
+});
+
+
+receiver.router.get('/api/message/sendMsg', printFromBro);
+receiver.router.post('/api/message/sendMsg', printFromBro);
+
+receiver.router.get('/api/keyHolders/getHolders', getAllHolders);
+receiver.router.post('/api/keyHolders/addHolder', addHolder);
+
+receiver.router.post('/api/labHours/toggleInOut', toggleInOut);
+
+receiver.router.get('/api/eventApi/getEvent', fetchAttendeeNames);
+
+receiver.router.get('/api/graphs/me/:slackname/:timeframe', myGraph); // options for timeframe: weekly, monthly, alltime
+receiver.router.get('/api/graphs/bytag/:tag/:timeframe', graphByTag); // options for timeframe: alltime, weekly, monthly
+
+receiver.router.get('/api/maintenance/setupLogs', setupLogs)
+
+startScheduler();
+
+app.error((err) => {
+  console.error('An error occurred:', err);
+});
 
 spawn_maintenance_thread()
 
-const PORT = process.env.PORT;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+await app.start(process.env.PORT);
+app.logger.info(`App started on port ${process.env.PORT}`);
+
