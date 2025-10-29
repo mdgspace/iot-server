@@ -6,6 +6,8 @@ export default function parseEmoji(message) {
   const lines = message.split('\n');
   const emojiLine = lines.find(line => line.toLowerCase().startsWith('react with '));
 
+  if (!emojiLine) return null;
+
   const emojiStr = emojiLine.split('react with ')[1]?.trim();
 
   // const match = message.match(/react with\s*:(\w+):/i);

@@ -30,6 +30,9 @@ export default function parseEventTime(message) {
 
   const dateObj = new Date(Date.UTC(year, month, day, hour, minute));
   // console.log('Parsed date object:', dateObj);
-  return dateObj.toISOString();
+
+  const utcTime = new Date(dateObj.getTime() - (5.5 * 60 * 60 * 1000));
+
+  return utcTime.toISOString();
 }
 

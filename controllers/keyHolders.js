@@ -9,17 +9,17 @@ export const addHolder = async (req, res) => {
     const yearPrefix = enroll_num_str.substring(0, 2);
 
     try {
-        const doesExist = await pool.query(
-            'SELECT * FROM keyHolders WHERE CAST(enrollment_num AS TEXT) ~ $1',
-            [`^${yearPrefix}`]
-        );
+        // const doesExist = await pool.query(
+        //     'SELECT * FROM keyHolders WHERE CAST(enrollment_num AS TEXT) ~ $1',
+        //     [`^${yearPrefix}`]
+        // );
 
-        if (doesExist && doesExist.rowCount > 0) {
-            await pool.query(
-                'DELETE FROM keyHolders WHERE CAST(enrollment_num AS TEXT) ~ $1',
-                [`^${yearPrefix}`]
-            );
-        }
+        // if (doesExist && doesExist.rowCount > 0) {
+        //     await pool.query(
+        //         'DELETE FROM keyHolders WHERE CAST(enrollment_num AS TEXT) ~ $1',
+        //         [`^${yearPrefix}`]
+        //     );
+        // }
         const memberDetails = await pool.query(
             'SELECT slack_name, enrollment_num, bhawan FROM members_info WHERE enrollment_num = $1',
             [enroll_num]
